@@ -33,7 +33,7 @@ run_mpi_tests() {
             HOSTS=1
         else
             # Executa em múltiplos nós
-            HOSTS=$HOSTS + 1
+            HOSTS=2
         fi
 
         echo "Executando com $PROCS processos nos hosts: $HOSTS..."
@@ -47,7 +47,7 @@ run_mpi_tests() {
 
 # Função principal
 main() {
-    gcc parallel/mandelbrot_openmp.c -o mandelbrot_omp -fopenmp -lm
+    gcc ../parallel/mandelbrot_openmp.c -o mandelbrot_omp -fopenmp -lm
     mpicc ../parallel/mandelbrot_mpi.c -o mandelbrot_mpi -lm
     
     # Executa os testes para OpenMP
