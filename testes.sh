@@ -3,7 +3,7 @@
 # Configurações gerais
 OUTPUT_DIR="resultados"  # Diretório para salvar os resultados
 NUM_CORES=$(nproc)       # Número de núcleos disponíveis no computador
-NODES="atlantica01,atlantica02,atlantica03,atlantica04,atlantica05,atlantica06,atlantica07,atlantica08,atlantica09,atlantica10,atlantica11,atlantica12,atlantica13,atlantica14,atlantica15,atlantica16"      # Nós do cluster (ajuste conforme necessário)
+NODES="atlantica01,atlantica02"      # Nós do cluster (ajuste conforme necessário)
 PROGRAM_OPENMP="../mandelbrot_omp"  # Executável do OpenMP
 PROGRAM_MPI="../mandelbrot_mpi"       # Executável do MPI
 
