@@ -17,7 +17,7 @@ run_openmp_tests() {
         export OMP_NUM_THREADS=$THREADS  # Define o número de threads para OpenMP
         echo "Executando com $THREADS threads..."
         START_TIME=$(date +%s%N)  # Início do temporizador
-        $PROGRAM_OPENMP > "$OUTPUT_DIR/openmp_${THREADS}_threads.txt"
+        srun --nodes=1 --ntasks=1 --cpus-per-task=8 mandelbrot_omp > "$OUTPUT_DIR/openmp_${THREADS}_threads.txt"
         END_TIME=$(date +%s%N)    # Fim do temporizador
         ELAPSED_TIME=$((($END_TIME - $START_TIME) / 1000000))  # Tempo em milissegundos
         echo "Tempo de execução com $THREADS threads: ${ELAPSED_TIME}ms"
@@ -30,15 +30,15 @@ run_mpi_tests() {
     for PROCS in $(seq 2 2 $((NUM_CORES * 2))); do
         if [ $PROCS -le $NUM_CORES ]; then
             # Executa em um único nó
-            HOSTS="node1"
+            HOSTS=1
         else
             # Executa em múltiplos nós
-            HOSTS=$NODES
+            HOSTS=$HOSTS + 1
         fi
 
         echo "Executando com $PROCS processos nos hosts: $HOSTS..."
         START_TIME=$(date +%s%N)  # Início do temporizador
-        mpirun -np $PROCS --host $HOSTS $PROGRAM_MPI > "$OUTPUT_DIR/mpi_${PROCS}_procs.txt"
+        srun --nodes=$HOSTS --ntasks=$PROCS mandelbrot_mpi > "$OUTPUT_DIR/mpi_${PROCS}_procs.txt"
         END_TIME=$(date +%s%N)    # Fim do temporizador
         ELAPSED_TIME=$((($END_TIME - $START_TIME) / 1000000))  # Tempo em milissegundos
         echo "Tempo de execução com $PROCS processos: ${ELAPSED_TIME}ms"
@@ -47,6 +47,9 @@ run_mpi_tests() {
 
 # Função principal
 main() {
+    gcc parallel/mandelbrot_openmp.c -o mandelbrot_omp -fopenmp -lm
+    mpicc ../parallel/mandelbrot_mpi.c -o mandelbrot_mpi -lm
+    
     # Executa os testes para OpenMP
     run_openmp_tests
 
