@@ -4,8 +4,7 @@
 OUTPUT_DIR="resultados"  # Diretório para salvar os resultados
 NUM_CORES=$(nproc)       # Número de núcleos disponíveis no computador
 NODES="atlantica01,atlantica02"      # Nós do cluster (ajuste conforme necessário)
-PROGRAM_OPENMP="../mandelbrot_omp"  # Executável do OpenMP
-PROGRAM_MPI="../mandelbrot_mpi"       # Executável do MPI
+# Executável do MPI
 
 # Criar diretório de resultados
 mkdir -p $OUTPUT_DIR
@@ -17,7 +16,7 @@ run_openmp_tests() {
         export OMP_NUM_THREADS=$THREADS  # Define o número de threads para OpenMP
         echo "Executando com $THREADS threads..."
         START_TIME=$(date +%s%N)  # Início do temporizador
-        srun --nodes=1 --ntasks=1 --cpus-per-task=8 mandelbrot_omp > "$OUTPUT_DIR/openmp_${THREADS}_threads.txt"
+        srun --nodes=1 --ntasks=1 --cpus-per-task=$NUM_CORES mandelbrot_omp > "$OUTPUT_DIR/openmp_${THREADS}_threads.txt"
         END_TIME=$(date +%s%N)    # Fim do temporizador
         ELAPSED_TIME=$((($END_TIME - $START_TIME) / 1000000))  # Tempo em milissegundos
         echo "Tempo de execução com $THREADS threads: ${ELAPSED_TIME}ms"
@@ -46,9 +45,7 @@ run_mpi_tests() {
 }
 
 # Função principal
-main() {
-    gcc ../parallel/mandelbrot_openmp.c -o mandelbrot_omp -fopenmp -lm
-    mpicc ../parallel/mandelbrot_mpi.c -o mandelbrot_mpi -lm
+main() {    
     
     # Executa os testes para OpenMP
     run_openmp_tests
